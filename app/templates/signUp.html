@@ -1,0 +1,51 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+{% include 'flash.html' %}
+<div class="well">
+        <h3>{{ _('Please Sign Up') }}</h3>
+        <form class="form" action="" method="post" name="signup">
+            {{ form.hidden_tag() }}
+            <div class="control-group{% if form.name.errors %} error{% endif %}">
+                <label class="control-label" for="name">{{ _('Enter your name here:') }}</label>
+                <div class="controls">
+                    {{ form.name(size=80, class="span4") }}
+                    {% for error in form.name.errors %}
+                        <span class="help-inline">[{{ error }}]</span><br>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="control-group{% if form.email.errors %} error{% endif %}">
+                <label class="control-label" for="email">{{ _('Enter your email here:') }}</label>
+                <div class="controls">
+                    {{ form.email(size=80, class="span4") }}
+                    {% for error in form.email.errors %}
+                        <span class="help-inline">[{{ error }}]</span><br>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="control-group{% if form.password.errors %} error{% endif %}">
+                <label class="control-label" for="password">{{ _('Enter your password here:') }}</label>
+                <div class="controls">
+                    {{ form.password(size=80, class="span4") }}
+                    {% for error in form.password.errors %}
+                        <span class="help-inline">[{{ error }}]</span><br>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="controls">
+                    <label class="checkbox" for="remember_me">
+                        {{ form.remember_me }} {{ _('Remember Me') }}
+                    </label>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="controls">
+                    <input class="btn btn-primary" type="submit" value="{{ _('Sign Up') }}">
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}

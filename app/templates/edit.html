@@ -1,0 +1,128 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>{{ _('Edit Your Profile') }}</h1>
+    {% include 'flash.html' %}
+    <div class="well">
+
+        <!-- File upload -->
+<!--         <input type="file" id="file-input"> -->
+
+        <form class="form-horizontal" action="" method="post" name="edit">
+            {{ form.hidden_tag() }}
+            
+            <!-- NOTE: chose to use other tactic for file upload -->
+            <div class="control-group{% if form.photo.errors %} error{% endif %}">
+                <label class="control-label" for="photo">{{ _('Your photo:') }}</label>
+                <div class="controls">
+                    {{ form.photo() }}
+                    {% for error in form.photo.errors %}
+                        <span class="help-inline">[{{ error }}]</span><br>
+                    {% endfor %}
+                </div>
+            </div>
+            <div>
+                <input type="hidden" id="avatar-url" name="avatar-url" value="/static/media/default.png">
+            </div>
+            <div class="control-group{% if form.nickname.errors %} error{% endif %}">
+                <label class="control-label" for="nickname">{{ _('Your nickname:') }}</label>
+                <div class="controls">
+                    {{ form.nickname(maxlength=64, class="span4") }}
+                    {% for error in form.nickname.errors %}
+                        <span class="help-inline">[{{ error }}]</span><br>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="control-group{% if form.about_me.errors %} error{% endif %}">
+                <label class="control-label" for="about_me">{{ _('About yourself:') }}</label>
+                <div class="controls">
+                    {{ form.about_me(cols=64, rows=4, class="span4") }}
+                    {% for error in form.about_me.errors %}
+                        <span class="help-inline">[{{ error }}]</span><br>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="controls">
+                    <input class="btn btn-primary" type="submit" value="{{ _('Save Changes') }}">
+                </div>
+            </div>
+        </form>
+        <script>
+        /*
+          Function to carry out the actual POST request to S3 using the signed request from the Python app.
+        */
+        function uploadFile(file, s3Data, url){
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', s3Data.url);
+            xhr.setRequestHeader('x-amz-acl', 'public-read');
+            const postData = new FormData();
+            for(key in s3Data.fields){
+                postData.append(key, s3Data.fields[key]);
+            }
+            postData.append('file', file);
+            xhr.onreadystatechange = () => {
+                if(xhr.readyState === 4){
+                    if(xhr.status === 200 || xhr.status === 204){
+                        document.getElementById('preview').src = url;
+                        document.getElementById('avatar-url').value = url;
+                    }
+                    else{
+                        alert('Could not upload file.');
+                    }
+                }
+            };
+            
+            xhr.send(postData);
+        }
+
+/*
+    Function to get the temporary signed request from the Python app.
+    If request successful, continue to upload the file using this signed
+    request.
+    */
+    function getSignedRequest(file){
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', `/sign-s3?file-name=${file.name}&file-type=${file.type}`);
+        xhr.onreadystatechange = () => {
+            if(xhr.readyState === 4){
+                if(xhr.status === 200){
+                const response = JSON.parse(xhr.responseText);
+                uploadFile(file, response.data, response.url);
+                }
+                else {
+                    alert('Could not get signed URL.');
+                }
+            }
+        };
+        
+        xhr.send();
+    }
+
+        /*
+            Function called when file input updated. If there is a file selected, then
+            start upload procedure by asking for a signed request from the app.
+        */
+        function initUpload(){
+            const files = document.getElementById('photo').files;
+            const file = files[0];
+            if(!file){
+                return alert('No file selected.');
+            }
+            // else {
+            //     document.location.href = "https://www.google.com/";
+            // }
+            getSignedRequest(file);
+        }
+
+        /*
+           Bind listeners when the page loads.
+        */
+        (() => {
+          document.getElementById('photo').onchange = initUpload;
+        })()
+
+        </script>
+    </div>
+{% endblock %}

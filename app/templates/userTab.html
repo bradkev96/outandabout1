@@ -1,0 +1,26 @@
+<table class="table table-hover">
+    <tr>
+        <td width="70px"><a href="{{ url_for('user', nickname=user.nickname) }}"><img src="{{ user.avatar(70) }}" /></a></td>
+        <td>
+            {% autoescape false %}
+
+            <h4>{{ _('%(nickname)s', nickname='<a href="%s">%s</a>' % (url_for('user', nickname=user.nickname), user.nickname),) }}</h4>
+
+            {% endautoescape %}
+
+            <p>{{ _('Followers:') }} {{ user.followers.count() - 1 }} | {{ _('Following:') }} {{ user.followed.count() - 1 }} </p>
+            
+            {% if user.id == g.user.id %}
+            <div><a href="{{ url_for('user', nickname=user.nickname) }}">{{ _('Your Profile') }}</a></div>
+            {% endif %}
+        </td>
+    </tr>
+</table>
+
+
+
+
+
+
+
+

@@ -1,0 +1,13 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ _('Search results for "%(query)s":', query = query) }}</h1>
+{% include 'flash.html' %}
+{% for user in userResults %}
+    {% include 'userTab.html' %}
+{% endfor %}
+{% for post in postResults %}
+    {% include 'post.html' %}
+{% endfor %}
+{% endblock %}

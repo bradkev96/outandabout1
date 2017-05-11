@@ -1,0 +1,1 @@
+            <!--<p>{{ _('%(nickname)', nickname='<a href="%s">%s</a>' % (url_for('user', nickname=user.nickname), user.nickname),) }}</p>-->
